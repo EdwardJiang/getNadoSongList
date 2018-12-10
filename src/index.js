@@ -38,21 +38,16 @@ const getYubaContent = function getYubaContent(result) {
   // 首条鱼吧信息
   var content = responseData.content;
   getCommonContent(content);
-  // // 鱼吧评论
-  // const hot_comments = responseData.hot_comments;
-  // for (let index = 0; index < hot_comments.length; index++) {
-  //   const element = hot_comments[index];
-    
-  //   // 只获取楼主的回复
-  //   if (element.uid === 32631686) {
-  //     getCommonContent(element.raw_content);
-  //   } else {
-  //     continue;
-  //   } 
-  // }
 }
 
+/**
+ * 从接口返回信息中提取数据
+ *
+ * @param {*} _content
+ * @returns
+ */
 const getData = function getData(_content) {
+  // 获取标题
   $content = cheerio.load(_content);
   let title = $content('b').text();
   let songList = [];
@@ -83,6 +78,7 @@ const getCommonContent = function getCommonContent(_content) {
   const data = getData(_content);
   // 输出
   // outputComment['outputConsole'](data);
+  // 写入excel
   outputComment['outputExcel'](data, EXCEL_PATH);
 }
 
@@ -113,16 +109,14 @@ const getYubaComment = function getYubaComment(content) {
       } 
     }
     // 判断是否是最后一页，如果不是继续获取下一页数据，直到最后一页
-    // setTimeout(() => {
-      if (currentPage < totalPage) {
-        let newYubaUrlcomment = yubaUrlcomment + '&page=' + (currentPage + 1);
-        getRequest(newYubaUrlcomment, getYubaComment);
-      }
-    // }, WAITTIME);
+    if (currentPage < totalPage) {
+      let newYubaUrlcomment = yubaUrlcomment + '&page=' + (currentPage + 1);
+      getRequest(newYubaUrlcomment, getYubaComment);
+    }
   }
 }
 getRequest(yubaUrl, getYubaContent);
-// 10秒后获取回复贴
+// 5秒后获取回复贴
 setTimeout(() => {
   getRequest(yubaUrlcomment + '&page=1', getYubaComment);
 }, WAITTIME);
